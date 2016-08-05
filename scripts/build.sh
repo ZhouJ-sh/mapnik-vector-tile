@@ -6,6 +6,14 @@ if [[ ${COVERAGE:-false} == true ]]; then
     export CXXFLAGS="--coverage"
 fi
 
-make -j${JOBS:-1} test BUILDTYPE=${BUILDTYPE:-Release} V=1
+ulimit -c unlimited -S
+
+RESULT=0
+make -j${JOBS:-1} test BUILDTYPE=${BUILDTYPE:-Release} V=1  || RESULT=$?
+ls -la
+for i in $(find ./ -maxdepth 1 -name 'core*' -print);
+  do gdb $(which ./build/${BUILDTYPE}/tests) $i -ex "thread apply all bt" -ex "set pagination 0" -batch;
+done;
+if [[ ${RESULT} != 0 ]]; then exit $RESULT; fi
 
 set +e +u

@@ -5140,8 +5140,6 @@ namespace Catch {
 
 } // namespace Catch
 
-#if defined ( CATCH_PLATFORM_WINDOWS ) /////////////////////////////////////////
-
 namespace Catch {
 
     struct FatalConditionHandler {
@@ -5149,8 +5147,6 @@ namespace Catch {
 	};
 
 } // namespace Catch
-
-#endif // not Windows
 
 #include <set>
 #include <string>

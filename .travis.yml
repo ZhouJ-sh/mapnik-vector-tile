@@ -18,7 +18,15 @@ matrix:
       sudo: false
       compiler: ": clang"
       env: JOBS=10 CXX="clang++-3.8"
-      sudo: false
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: [ 'libstdc++-5-dev', 'gdb', 'apport']
+    - os: linux
+      sudo: required
+      dist: trusty
+      compiler: ": clang"
+      env: JOBS=10 CXX="clang++-3.8"
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']

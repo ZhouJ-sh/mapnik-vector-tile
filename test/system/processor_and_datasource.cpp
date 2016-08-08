@@ -152,47 +152,72 @@ TEST_CASE("vector tile render simple point")
 {
     // should be able to parse message and render point
     unsigned tile_size = 4096;
+    std::clog << "debug 1\n";
     mapnik::Map map(256, 256, "+init=epsg:3857");
+    std::clog << "debug 2\n";
     mapnik::layer lyr("layer", map.srs());
+    std::clog << "debug 3\n";
     lyr.set_datasource(testing::build_ds(0,0));
+    std::clog << "debug 4\n";
     map.add_layer(lyr);
+    std::clog << "debug 5\n";
     
     // create processor
     mapnik::vector_tile_impl::processor ren(map);
+    std::clog << "debug 6\n";
     mapnik::vector_tile_impl::tile out_tile = ren.create_tile(0,0,0);
+    std::clog << "debug 7\n";
     // serialize to message
     std::string buffer;
     out_tile.serialize_to_string(buffer);
+    std::clog << "debug 8\n";
     CHECK(out_tile.is_painted() == true);
+    std::clog << "debug 9\n";
     CHECK(out_tile.is_empty() == false);
+    std::clog << "debug 10\n";
     CHECK(147 == buffer.size());
+    std::clog << "debug 11\n";
 
     // create a new vector tile from the buffer
     vector_tile::Tile tile2;
     CHECK(tile2.ParseFromString(buffer));
+    std::clog << "debug 12\n";
 
     // Validate the new tile.
     CHECK(1 == tile2.layers_size());
+    std::clog << "debug 13\n";
     vector_tile::Tile_Layer const& layer2 = tile2.layers(0);
+    std::clog << "debug 14\n";
     CHECK(std::string("layer") == layer2.name());
+    std::clog << "debug 15\n";
     CHECK(1 == layer2.features_size());
-    
+    std::clog << "debug 16\n";
+
     // Create another map
     mapnik::Map map2(256, 256, "+init=epsg:3857");
+    std::clog << "debug 17\n";
     mapnik::layer lyr2("layer",map.srs());
-    
+    std::clog << "debug 18\n";
+
     // Create datasource from tile.
     protozero::pbf_reader layer_reader;
+    std::clog << "debug 19\n";
     out_tile.layer_reader(0, layer_reader);
+    std::clog << "debug 20\n";
     std::shared_ptr<mapnik::vector_tile_impl::tile_datasource_pbf> ds = std::make_shared<
                                     mapnik::vector_tile_impl::tile_datasource_pbf>(
                                         layer_reader,0,0,0);
+    std::clog << "debug 21\n";
     CHECK( ds->type() == mapnik::datasource::Vector );
+    std::clog << "debug 22\n";
     CHECK( ds->get_geometry_type() == mapnik::datasource_geometry_t::Collection );
+    std::clog << "debug 23\n";
     
     // Check that all the names are in the list
     mapnik::layer_descriptor lay_desc = ds->get_descriptor();
+    std::clog << "debug 24\n";
     std::set<std::string> expected_names;
+    std::clog << "debug 25\n";
     expected_names.insert("bool");
     expected_names.insert("boolf");
     expected_names.insert("double");
@@ -200,24 +225,36 @@ TEST_CASE("vector tile render simple point")
     expected_names.insert("int");
     expected_names.insert("name");
     expected_names.insert("uint");
+    std::clog << "debug 26\n";
     std::size_t desc_count = 0;
     for (auto const& desc : lay_desc.get_descriptors())
     {
+        std::clog << "debug 27  " << desc_count << "\n";
         ++desc_count;
         CHECK(expected_names.count(desc.get_name()) == 1);
     }
+    std::clog << "debug 28\n";
     CHECK(desc_count == expected_names.size());
     
+    std::clog << "debug 29\n";
     // Add datasource to layer and map
     lyr2.set_datasource(ds);
+    std::clog << "debug 30\n";
     lyr2.add_style("style");
+    std::clog << "debug 31\n";
     map2.add_layer(lyr2);
+    std::clog << "debug 32\n";
     // Load map style
     mapnik::load_map(map2,"test/data/style.xml");
+    std::clog << "debug 33\n";
     map2.zoom_all();
+    std::clog << "debug 34\n";
     mapnik::image_rgba8 im(map2.width(),map2.height());
+    std::clog << "debug 35\n";
     mapnik::agg_renderer<mapnik::image_rgba8> ren2(map2,im);
+    std::clog << "debug 36\n";
     ren2.apply();
+    std::clog << "debug 37\n";
 
     if (!mapnik::util::exists("test/fixtures/expected-1.png"))
     {
@@ -229,6 +266,7 @@ TEST_CASE("vector tile render simple point")
     {
         mapnik::save_to_file(im,"test/fixtures/actual-1.png","png32");
     }
+    std::clog << "debug 38\n";
 }
 
 TEST_CASE("vector tile datasource -- should filter features outside extent")
